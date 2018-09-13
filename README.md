@@ -7,7 +7,7 @@ This program is a simple way to fetch, uncompress, and upload the [DeepLesion](h
 Will download each 4GB zip from the dataset, unzip it, and upload the images to `my-bucket`. This configuration with `removeFiles=true` will delete each zip file after it has successfully uploaded the contents to GCP. 
 
 ```sh
-./deeplesion-loader --parallel=true
+./deeplesion-loader --bucketName=my-bucket --parallel=true
 ```
 Will run all file downloads and uploads in parallel--this is *much faster*, but requires more disk space and resources. 
 
