@@ -22,13 +22,14 @@ var (
 func main() {
 	flag.Parse()
 	if *parallel {
-		BeginParallel()
+		BeginConcurrent()
 	} else {
 		Begin()
 	}
 
 }
 
+// Begin starts the download, unzip, and upload process with no concurrency
 func Begin() {
 	for i, url := range DownloadURLs {
 		fn := fmt.Sprintf("Images_png_%02d.zip", i + 1)
@@ -39,7 +40,8 @@ func Begin() {
 	}
 }
 
-func BeginParallel() {
+// BeginConcurrent will begin the download, unzip, and upload process for all source files concurrently
+func BeginConcurrent() {
 	var wg sync.WaitGroup
 	for i, url := range DownloadURLs {
 		fn := fmt.Sprintf("Images_png_%02d.zip", i + 1)
@@ -49,6 +51,7 @@ func BeginParallel() {
 	wg.Wait()
 }
 
+// FetchUploadAndHandleFile fetches, unzips, and uploads the file at url to the bucket specified by bucketName
 func FetchUploadAndHandleFile(filename, url, bucketName string, wg *sync.WaitGroup) error {
 	log.Printf("Starting download of %s\n", filename)
 	FetchFile(filename, url)
@@ -60,6 +63,7 @@ func FetchUploadAndHandleFile(filename, url, bucketName string, wg *sync.WaitGro
 	return nil
 }
 
+// UnzipAndUploadFiles unzips the file at filename and then uploads the constituent files to the bucketName bucket
 func UnzipAndUploadFiles(filename, bucketName string) error {
 	r, err := zip.OpenReader(filename)
 	if err != nil {
@@ -99,6 +103,7 @@ func UnzipAndUploadFiles(filename, bucketName string) error {
 	return nil
 }
 
+// FetchFile downloads the file at the url and saves it to the local filename path
 func FetchFile(filename string, url string) error {
 	// Create the file
 	out, err := os.Create(filename)
